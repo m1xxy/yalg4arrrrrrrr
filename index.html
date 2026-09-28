@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO & Meta Tags -->
+    <title>yalg4ar | Next-Gen Creation & Infrastructure</title>
+    <meta name="description" content="Professional, high-performance websites built for local businesses.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Google Fonts: Inter & Instrument Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS v4 Browser Engine -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <!-- Dependencies for React, Framer Motion, HLS.js, Iconify -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- CSS Setup -->
+    <style type="text/tailwindcss">
+        @theme {
+            --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+            --color-brand-red: #A63A29;
+        }
+        
+        :root {
+            --background: #000000;
+            --foreground: #ffffff;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.01em;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- LIQUID GLASSMORPHISM (For Hero) --- */
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.01);
+            background-blend-mode: luminosity;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: none;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1.4px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 20%, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.15) 80%, rgba(255, 255, 255, 0.45) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        /* --- IRIDESCENT RING PILL COMPONENT --- */
+        .iri-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 20px 9px 9px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-decoration: none;
+            color: #fff;
+            font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .iri-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .iri-disc-wrap {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        .iri-disc {
+            position: absolute;
+            inset: 0;
+            background: #111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .iri-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(from 0turn, transparent 0 58%, #ff6ea9 68%, #ffd36e 76%, #6ef0ff 84%, transparent 92%);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+            animation: iri-orbit 2.6s linear infinite, iri-hue 7s linear infinite;
+            z-index: 1;
+        }
+
+        .iri-pill:hover .iri-ring { animation-play-state: paused, running; }
+
+        @keyframes iri-orbit { 0% { transform: rotate(0turn); } 100% { transform: rotate(1turn); } }
+        @keyframes iri-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .iri-ring { animation: none !important; transform: rotate(45deg); filter: hue-rotate(0deg); } }
+
+        /* --- 3D PORTFOLIO CARD STYLES --- */
+        .stage { perspective: 1100px; transform-style: preserve-3d; }
+        .project-card {
+            transform-style: preserve-3d;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), transparent 34%), #121212;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+            transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+        .project-card::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(255, 255, 255, 0.08); pointer-events: none; }
+        .project-card:hover::after { border-color: rgba(255, 255, 255, 0.3); }
+        .portrait { transform: translateZ(20px); box-shadow: inset 0 1px rgba(255, 255, 255, 0.04), inset 0 -16px 28px rgba(0, 0, 0, 0.13); }
+        .identity { transform: translateZ(35px); }
+        .project-btn { transform: translateZ(45px); transition: background 0.2s, color 0.2s; }
+
+        /* General UI Styles */
+        .solid-hover:hover { transform: translate(-4px, -4px); box-shadow: 4px 4px 0 0 var(--color-brand-red); }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; background: white; border: 2px solid black; cursor: pointer; margin-top: -10px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #333; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        #page-loader { transition: transform 0.5s cubic-bezier(0.8, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-black text-white font-sans min-h-screen overflow-x-hidden antialiased selection:bg-white selection:text-black flex flex-col relative">
+
+    <!-- Loading Screen -->
+    <div id="page-loader" class="fixed inset-0 z-[100] bg-black flex items-center justify-center">
+        <div class="text-2xl font-extrabold tracking-tighter">LOADING SYSTEM...</div>
+    </div>
+
+    <!-- WebGL Background (Fixed behind the content sections) -->
+    <canvas id="glcanvas" class="fixed inset-0 w-full h-full -z-20"></canvas>
+    <div class="fixed inset-0 pointer-events-none -z-10 w-full h-full">
+        <div class="absolute top-0 left-0 w-[600px] h-[600px] border-l border-t border-white/10 origin-top-left rotate-[15deg] translate-x-[-100px] translate-y-[-100px]"></div>
+        <div class="absolute top-0 left-0 w-[800px] h-[800px] border-l border-white/10 origin-top-left rotate-[-25deg] translate-x-[200px] translate-y-[-50px]"></div>
+    </div>
+
+    <!-- 1. REACT HERO SECTION -->
+    <div id="react-hero-root" class="relative w-full h-screen shrink-0 z-10"></div>
+
+    <!-- 2. VANILLA HTML CONTENT (Scrolls up over the WebGL background) -->
+    <div id="main-content" class="relative z-10 w-full max-w-[1600px] mx-auto border-l border-r border-white/10 bg-black/40 backdrop-blur-sm">
+        
+        <!-- OUR WORK -->
+        <section id="work" class="py-24 px-8 sm:px-16 lg:px-24">
+            <h2 class="text-4xl font-extrabold uppercase mb-4">Our Work</h2>
+            <p class="text-gray-400 mb-16 max-w-xl">Move your cursor over the projects to interact with the architecture. Real sites, real commerce.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 stage">
+                <!-- Project 1: RaasPK -->
+                <div class="project-card relative w-full aspect-[4/3] p-6 flex flex-col justify-between cursor-crosshair group">
+                    <div class="portrait relative w-full h-[60%] overflow-hidden bg-black/50">
+                        <img src="https://image.thum.io/get/width/800/crop/800/https://raaspk.shop/" alt="raaspk.shop" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <div class="identity text-left mt-6">
+                        <h3 class="text-3xl font-extrabold uppercase tracking-tighter">RaasPK</h3>
+                        <p class="text-sm text-brand-red font-bold uppercase tracking-widest mt-1">E-Commerce Architecture</p>
+                    </div>
+                    <a href="https://raaspk.shop" target="_blank" class="project-btn mt-6 w-max border border-white/20 px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black">Visit Site</a>
+                </div>
+
+                <!-- Project 2: Doha Center -->
+                <div class="project-card relative w-full aspect-[4/3] p-6 flex flex-col justify-between cursor-crosshair group">
+                    <div class="portrait relative w-full h-[60%] overflow-hidden bg-black/50">
+                        <img src="https://image.thum.io/get/width/800/crop/800/https://dohacenter.shop/" alt="dohacenter.shop" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                    </div>
+                    <div class="identity text-left mt-6">
+                        <h3 class="text-3xl font-extrabold uppercase tracking-tighter">Doha Center</h3>
+                        <p class="text-sm text-brand-red font-bold uppercase tracking-widest mt-1">E-Commerce Architecture</p>
+                    </div>
+                    <a href="https://dohacenter.shop" target="_blank" class="project-btn mt-6 w-max border border-white/20 px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black">Visit Site</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full border-t border-white/20"></div>
+
+        <!-- PRICING PLANS (Restored 3-Column Grid) -->
+        <section id="pricing" class="pt-24 pb-12 px-8 sm:px-16 lg:px-24">
+            <h2 class="text-4xl font-extrabold uppercase mb-12">Fixed Packages</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+                
+                <!-- Starter (12K) -->
+                <div class="border border-white/20 p-8 xl:p-10 bg-black solid-hover transition-all flex flex-col">
+                    <span class="text-brand-red font-bold tracking-widest uppercase text-sm mb-4">Starter</span>
+                    <div class="text-5xl xl:text-6xl font-extrabold mb-8">12K <span class="text-xl text-gray-500 font-medium">PKR</span></div>
+                    <ul class="flex flex-col gap-4 mb-10 flex-1 text-sm">
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Single Page Design</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Mobile Responsive</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Contact Form</li>
+                    </ul>
+                    <a href="#customizer" class="w-full border border-white text-center py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors">Select Starter</a>
+                </div>
+
+                <!-- Growth (25K) - RECOMMENDED -->
+                <div class="border border-brand-red p-8 xl:p-10 bg-black solid-hover transition-all flex flex-col relative transform lg:-translate-y-4">
+                    <div class="absolute top-0 right-0 bg-brand-red text-white text-xs font-bold uppercase px-3 py-1">Recommended</div>
+                    <span class="text-brand-red font-bold tracking-widest uppercase text-sm mb-4">Growth</span>
+                    <div class="text-5xl xl:text-6xl font-extrabold mb-8">25K <span class="text-xl text-gray-500 font-medium">PKR</span></div>
+                    <ul class="flex flex-col gap-4 mb-10 flex-1 text-sm">
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Up to 4 Pages</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Mobile Responsive</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Contact Form + WhatsApp</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Basic SEO Setup</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Custom Domain Setup</li>
+                    </ul>
+                    <a href="#customizer" class="w-full bg-brand-red text-white text-center py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors">Select Growth</a>
+                </div>
+
+                <!-- Pro (80K) -->
+                <div class="border border-white/20 p-8 xl:p-10 bg-black solid-hover transition-all flex flex-col">
+                    <span class="text-brand-red font-bold tracking-widest uppercase text-sm mb-4">Pro</span>
+                    <div class="text-5xl xl:text-6xl font-extrabold mb-8">80K <span class="text-xl text-gray-500 font-medium">PKR</span></div>
+                    <ul class="flex flex-col gap-4 mb-10 flex-1 text-sm">
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Unlimited Pages</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Online Store</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Advanced SEO Setup</li>
+                        <li class="flex items-center gap-3"><iconify-icon icon="lucide:check" class="text-white shrink-0"></iconify-icon> Custom Domain Included</li>
+                    </ul>
+                    <a href="#customizer" class="w-full border border-white text-center py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors">Select Pro</a>
+                </div>
+            </div>
+
+            <!-- IRIDESCENT PILL BUTTON COMPONENT (Bridging into Add-ons) -->
+            <div class="flex justify-center mt-8 pb-12">
+                <a href="#customizer" class="iri-pill">
+                    <div class="iri-disc-wrap">
+                        <div class="iri-ring"></div>
+                        <div class="iri-disc">
+                            <iconify-icon icon="lucide:arrow-down" class="text-white"></iconify-icon>
+                        </div>
+                    </div>
+                    Configure Custom Add-ons
+                </a>
+            </div>
+        </section>
+
+        <div class="w-full border-t border-white/20"></div>
+
+        <!-- CUSTOMIZER SECTION (Now with Unlimited Pages Scroll) -->
+        <section id="customizer" class="py-24 px-8 sm:px-16 lg:px-24 bg-zinc-950">
+            <h2 class="text-4xl font-extrabold uppercase mb-4">Build Your Add-ons</h2>
+            <p class="text-gray-400 mb-12 max-w-xl">Customize your setup. Slide the pages to the end for Unlimited. The price updates instantly.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-0 border border-white/20">
+                <div class="lg:col-span-3 p-8 md:p-12 border-b lg:border-b-0 lg:border-r border-white/20 bg-black">
+                    <h3 class="text-xl font-bold uppercase mb-8 border-b border-white/10 pb-4">Configuration</h3>
+                    
+                    <div class="mb-10">
+                        <div class="flex justify-between font-bold mb-4">
+                            <span>Total Pages</span>
+                            <span id="pageCountDisplay" class="text-brand-red">1 Page</span>
+                        </div>
+                        <!-- Slider max is 16 (16 = Unlimited) -->
+                        <input type="range" id="pageSlider" min="1" max="16" value="1">
+                        <p class="text-sm text-gray-500 mt-2">PKR 3,000 per additional page. Scroll to end for Unlimited.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="flex items-start gap-4 p-4 border border-white/20 cursor-pointer hover:border-white transition-colors">
+                            <input type="checkbox" id="seoCheck" value="15000" class="w-6 h-6 accent-brand-red mt-1">
+                            <div>
+                                <h4 class="font-bold">Google SEO Setup</h4>
+                                <p class="text-sm text-gray-400">Sitemap, meta tags, and keyword optimization. (+PKR 15,000)</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-4 p-4 border border-white/20 cursor-pointer hover:border-white transition-colors">
+                            <input type="checkbox" id="storeCheck" value="35000" class="w-6 h-6 accent-brand-red mt-1">
+                            <div>
+                                <h4 class="font-bold">E-Commerce Functionality</h4>
+                                <p class="text-sm text-gray-400">Shopping cart and basic payments. (+PKR 35,000)</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 p-8 md:p-12 bg-zinc-900 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold uppercase mb-8 border-b border-white/10 pb-4">Live Estimate</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between text-gray-400"><span>Base Setup</span> <span>PKR 10,000</span></div>
+                            <div id="receiptPages" class="flex justify-between text-white font-bold"><span>1 Page</span> <span>PKR 3,000</span></div>
+                            <div id="receiptSeo" class="hidden justify-between text-white font-bold"><span>SEO Setup</span> <span>PKR 15,000</span></div>
+                            <div id="receiptStore" class="hidden justify-between text-white font-bold"><span>E-Commerce</span> <span>PKR 35,000</span></div>
+                        </div>
+                    </div>
+                    <div class="mt-12 pt-6 border-t border-white/20">
+                        <div class="flex justify-between items-end mb-6">
+                            <span class="text-sm font-bold uppercase text-gray-400">Total</span>
+                            <span id="totalPrice" class="text-4xl font-extrabold text-brand-red">PKR 13,000</span>
+                        </div>
+                        <button class="w-full bg-white text-black font-extrabold uppercase py-4 solid-hover">Request Build</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full border-t border-white/20"></div>
+
+        <!-- Secure Area Form -->
+        <section class="py-24 px-8 sm:px-16 lg:px-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div>
+                    <h2 class="text-4xl font-extrabold uppercase mb-4">Client Portal</h2>
+                    <p class="text-gray-400 mb-8">Access your project files and testing environments.</p>
+                    
+                    <div class="flex items-center gap-4 p-4 border border-white/20 bg-black mb-8 w-max group">
+                        <span id="copyText" class="font-mono text-sm">yalg4ar@gmail.com</span>
+                        <button id="copyBtn" class="bg-white text-black text-xs font-bold px-3 py-1 uppercase group-hover:bg-brand-red group-hover:text-white transition-colors">Copy</button>
+                    </div>
+                </div>
+
+                <form id="portalForm" class="flex flex-col gap-6 bg-black p-8 border border-white/20">
+                    <div id="formError" class="hidden bg-red-900/50 border border-red-500 text-red-200 p-4 text-sm font-bold">Invalid credentials provided.</div>
+                    
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Email Address</label>
+                        <input type="email" id="email" required class="bg-transparent border border-white/30 p-3 outline-none focus:border-white">
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 relative">
+                        <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Access Key</label>
+                        <input type="password" id="password" required class="bg-transparent border border-white/30 p-3 outline-none focus:border-white pr-12">
+                        <button type="button" id="pwToggle" class="absolute right-4 top-9 text-gray-400 hover:text-white"><iconify-icon icon="lucide:eye"></iconify-icon></button>
+                    </div>
+
+                    <button type="submit" class="bg-brand-red text-white font-extrabold uppercase py-4 mt-4 solid-hover">Authenticate</button>
+                </form>
+            </div>
+        </section>
+
+        <div class="w-full border-t border-white/20"></div>
+
+        <!-- Footer / FAQ -->
+        <footer class="w-full grid grid-cols-1 lg:grid-cols-12 min-h-[300px] bg-black">
+            <div class="lg:col-span-4 p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-white/20 flex flex-col gap-6">
+                <a href="#" class="text-2xl font-extrabold tracking-tighter uppercase">yalg4ar<span class="text-brand-red">.</span></a>
+                <p class="text-sm text-gray-400 leading-relaxed max-w-[280px]">High-performance digital infrastructure for businesses that demand speed and ownership.</p>
+                <div class="mt-4">
+                    <div class="text-white font-bold">0320-7171575</div>
+                    <div class="text-xs text-gray-400">yalg4ar@gmail.com</div>
+                </div>
+                <p class="text-xs text-gray-600 mt-auto font-mono">Last Updated: <span id="lastUpdatedDate"></span></p>
+            </div>
+            <div class="lg:col-span-8 p-8 sm:p-12 lg:p-16 grid grid-cols-2 gap-12">
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-2">Systems</h3>
+                    <a href="#work" class="text-sm text-gray-400 hover:text-white font-medium">Our Work</a>
+                    <a href="#pricing" class="text-sm text-gray-400 hover:text-white font-medium">Pricing Matrix</a>
+                    <a href="#customizer" class="text-sm text-gray-400 hover:text-white font-medium">Custom Builder</a>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-2">Intel</h3>
+                    <details class="text-sm text-gray-400 cursor-pointer">
+                        <summary class="hover:text-white font-medium outline-none">Do I own the code?</summary>
+                        <p class="mt-2 text-xs">Yes. We retain zero equity in your intellectual property once settled.</p>
+                    </details>
+                    <details class="text-sm text-gray-400 cursor-pointer">
+                        <summary class="hover:text-white font-medium outline-none">What is the stack?</summary>
+                        <p class="mt-2 text-xs">Raw HTML/JS/CSS, Tailwind, and React/Next.js for complex systems.</p>
+                    </details>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/923207171575" target="_blank" class="fixed bottom-6 right-6 bg-brand-red text-white p-4 z-50 solid-hover shadow-lg flex items-center gap-2 font-bold uppercase text-sm no-print">
+        <iconify-icon icon="lucide:message-square" width="20"></iconify-icon>
+        <span class="hidden sm:inline">WhatsApp Us</span>
+    </a>
+
+    <!-- ========================================== -->
+    <!-- 1. REACT HERO APPLICATION SCRIPT (Babel)   -->
+    <!-- ========================================== -->
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        const GlobeIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        );
+        const ArrowRightIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        );
+        const CheckIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><path d="M20 6 9 17l-5-5"/></svg>
+        );
+        const ChevronDownIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><path d="m6 9 6 6 6-6"/></svg>
+        );
+
+        function BackgroundVideo() {
+            const videoRef = useRef(null);
+            useEffect(() => {
+                const video = videoRef.current;
+                const src = "https://stream.mux.com/kimF2ha9zLrX64H00UgLGPflCzNtl1T0215MlAmeOztv8.m3u8";
+                if (video.canPlayType("application/vnd.apple.mpegurl")) {
+                    video.src = src;
+                } else if (Hls.isSupported()) {
+                    const hls = new Hls(); hls.loadSource(src); hls.attachMedia(video);
+                }
+            }, []);
+            return (
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <video ref={videoRef} autoPlay muted loop playsInline className="w-full h-full object-cover opacity-100"></video>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black pointer-events-none"></div>
+                </div>
+            );
+        }
+
+        function Navbar() {
+            return (
+                <motion.nav initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative z-20 px-6 py-6 w-full">
+                    <div className="liquid-glass rounded-full px-6 py-3 flex items-center justify-between max-w-5xl mx-auto border border-white/10">
+                        <div className="flex items-center gap-8">
+                            <div className="flex items-center gap-2">
+                                <GlobeIcon />
+                                <span className="text-white font-semibold text-lg uppercase tracking-widest">yalg4ar</span>
+                            </div>
+                            <div className="hidden md:flex items-center gap-8 text-white/80 text-sm font-medium uppercase tracking-wide">
+                                <a href="#work" className="hover:text-white transition-colors duration-300 no-underline">Work</a>
+                                <a href="#pricing" className="hover:text-white transition-colors duration-300 no-underline">Pricing</a>
+                                <a href="#customizer" className="hover:text-white transition-colors duration-300 no-underline">Add-ons</a>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <a href="tel:03207171575" className="text-white hover:text-white/80 transition-colors text-sm font-medium no-underline">0320-7171575</a>
+                        </div>
+                    </div>
+                </motion.nav>
+            );
+        }
+
+        function Hero() {
+            const [ctaState, setCtaState] = useState('button');
+            const [placeholder, setPlaceholder] = useState('');
+
+            useEffect(() => {
+                let targetText = '';
+                if (ctaState === 'email') targetText = "Enter Your Email Here For Early Access";
+                else if (ctaState === 'submitted') targetText = "You Will Receive Notifications By Email";
+                else { setPlaceholder(''); return; }
+
+                setPlaceholder(''); let i = 0;
+                const interval = setInterval(() => {
+                    setPlaceholder(targetText.slice(0, i + 1)); i++;
+                    if (i >= targetText.length) clearInterval(interval);
+                }, 60);
+                return () => clearInterval(interval);
+            }, [ctaState]);
+
+            const handleSubmit = (e) => {
+                e.preventDefault(); setCtaState('submitted');
+                setTimeout(() => setCtaState('button'), 4000);
+            };
+
+            return (
+                <section className="relative flex-1 flex flex-col items-center justify-center px-6">
+                    <div className="relative z-10 text-center max-w-5xl mx-auto flex flex-col items-center justify-center w-full gap-8">
+                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-white/80 text-[10px] md:text-[11px] font-medium tracking-[0.2em] uppercase mb-4">
+                            BUILD A HIGH-PERFORMANCE WEB APP IN DAYS
+                        </motion.p>
+                        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} style={{ fontFamily: "'Instrument Serif', serif" }} className="text-4xl md:text-[64px] font-medium tracking-[-0.01em] leading-[1.1] bg-gradient-to-b from-white via-white/95 to-white/70 bg-clip-text text-transparent max-w-4xl">
+                            A new way to think and create <br className="hidden md:block" /> with computers
+                        </motion.h1>
+
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="min-h-[50px] flex flex-col items-center w-full mt-4">
+                            <AnimatePresence mode="wait">
+                                {ctaState === 'button' ? (
+                                    <motion.button key="btn" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} transition={{ duration: 0.2 }} onClick={() => setCtaState('email')} className="px-10 py-3 text-[14px] font-medium border border-white/10 rounded-full hover:border-white/30 hover:bg-white/[0.02] transition-all duration-300 text-white/90 backdrop-blur-sm cursor-pointer">
+                                        Get early access
+                                    </motion.button>
+                                ) : (
+                                    <motion.form key="form" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} transition={{ duration: 0.2 }} onSubmit={handleSubmit} className="flex items-center gap-2 pl-5 pr-1.5 py-1.5 text-[14px] font-medium border border-white/20 rounded-full bg-white/[0.02] backdrop-blur-sm w-full max-w-[320px] focus-within:border-white/40 transition-colors duration-300">
+                                        <input type="email" placeholder={placeholder} autoFocus required className="bg-transparent border-none outline-none text-white placeholder-white/45 flex-1 min-w-0" />
+                                        <button type="submit" className="flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border-none">
+                                            {ctaState === 'submitted' ? <CheckIcon /> : <ArrowRightIcon />}
+                                        </button>
+                                    </motion.form>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.8 }} className="mt-8">
+                            <a href="#customizer" className="iri-pill">
+                                <div className="iri-disc-wrap"><div className="iri-ring"></div><div className="iri-disc"><ChevronDownIcon /></div></div>
+                                Configure Custom Add-ons
+                            </a>
+                        </motion.div>
+                    </div>
+                </section>
+            );
+        }
+
+        function App() {
+            return (
+                <div className="w-full h-full flex flex-col">
+                    <BackgroundVideo />
+                    <Navbar />
+                    <Hero />
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('react-hero-root'));
+        root.render(<App />);
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 2. VANILLA JS LOGIC FOR THE REST OF SITE   -->
+    <!-- ========================================== -->
+    <script>
+        // Set Date
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            loader.style.transform = 'translateY(-100%)';
+            setTimeout(() => loader.remove(), 500);
+            document.getElementById('lastUpdatedDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        });
+
+        // 3D Hover Effect for Portfolio
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -8; 
+                const rotateY = ((x - centerX) / centerX) * 8;
+                card.style.setProperty('--rx', `${rotateX}deg`);
+                card.style.setProperty('--ry', `${rotateY}deg`);
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.setProperty('--rx', `0deg`);
+                card.style.setProperty('--ry', `0deg`);
+            });
+        });
+
+        // Customizer Calculator (UPDATED FOR UNLIMITED PAGES)
+        const pageSlider = document.getElementById('pageSlider');
+        const pageCountDisplay = document.getElementById('pageCountDisplay');
+        const seoCheck = document.getElementById('seoCheck');
+        const storeCheck = document.getElementById('storeCheck');
+        const receiptPages = document.getElementById('receiptPages');
+        const receiptSeo = document.getElementById('receiptSeo');
+        const receiptStore = document.getElementById('receiptStore');
+        const totalPriceDisplay = document.getElementById('totalPrice');
+
+        function calcTotal() {
+            let total = 10000;
+            let pages = parseInt(pageSlider.value);
+            let pagesCost = 0;
+            let pagesText = "";
+
+            // 16 is the max value mapped to "Unlimited"
+            if (pages === 16) {
+                pagesCost = 50000; // Flat fee for unlimited pages
+                pagesText = "Unlimited Pages";
+            } else {
+                pagesCost = pages * 3000;
+                pagesText = pages === 1 ? '1 Page' : `${pages} Pages`;
+            }
+
+            total += pagesCost;
+            
+            pageCountDisplay.innerText = pages === 16 ? "Unlimited" : pagesText;
+            receiptPages.innerHTML = `<span>${pagesText}</span> <span>PKR ${pagesCost.toLocaleString()}</span>`;
+
+            if(seoCheck.checked) { total += parseInt(seoCheck.value); receiptSeo.classList.remove('hidden'); receiptSeo.classList.add('flex'); } 
+            else { receiptSeo.classList.add('hidden'); receiptSeo.classList.remove('flex'); }
+
+            if(storeCheck.checked) { total += parseInt(storeCheck.value); receiptStore.classList.remove('hidden'); receiptStore.classList.add('flex'); } 
+            else { receiptStore.classList.add('hidden'); receiptStore.classList.remove('flex'); }
+
+            totalPriceDisplay.innerText = `PKR ${total.toLocaleString()}`;
+        }
+        pageSlider.addEventListener('input', calcTotal);
+        seoCheck.addEventListener('change', calcTotal);
+        storeCheck.addEventListener('change', calcTotal);
+        calcTotal();
+
+        // WebGL Background Shader
+        const canvas = document.getElementById('glcanvas');
+        const gl = canvas.getContext('webgl');
+        if (gl) {
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, canvas.width, canvas.height); }
+            window.addEventListener('resize', resize);
+            resize();
+            const vsSource = `attribute vec4 aVertexPosition; void main() { gl_Position = aVertexPosition; }`;
+            const fsSource = `
+                precision highp float;
+                uniform vec2 u_resolution; uniform float u_time;
+                mat2 rot(float a) { float s = sin(a), c = cos(a); return mat2(c, -s, s, c); }
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / u_resolution.xy; vec2 p = uv * 2.0 - 1.0; p.x *= u_resolution.x / u_resolution.y;
+                    vec2 flow_uv = p; float time = u_time * 0.4;
+                    for(float i = 1.0; i < 4.0; i++) {
+                        flow_uv *= rot(time * 0.1); flow_uv.x += sin(flow_uv.y * 2.0 * i + time) * 0.5; flow_uv.y += cos(flow_uv.x * 1.5 * i - time * 0.8) * 0.5;
+                    }
+                    float intensity = sin(flow_uv.x * 2.0 + flow_uv.y * 3.0) * 0.5 + 0.5;
+                    vec3 col_dark = vec3(0.02, 0.0, 0.0); vec3 col_red = vec3(0.65, 0.22, 0.16); vec3 col_bright = vec3(0.8, 0.1, 0.05);
+                    vec3 fluid_color = mix(col_dark, col_red, smoothstep(0.2, 0.6, intensity));
+                    fluid_color = mix(fluid_color, col_bright, smoothstep(0.7, 1.0, intensity));
+                    float gridSize = 6.0; vec2 grid_uv = gl_FragCoord.xy / gridSize; vec2 cell_uv = fract(grid_uv) - 0.5;
+                    float dist = length(cell_uv); float radius = intensity * 0.45; float dot_mask = smoothstep(radius, radius - 0.1, dist);
+                    vec3 final_color = mix(vec3(0.0), fluid_color, dot_mask); final_color += fluid_color * 0.15;
+                    gl_FragColor = vec4(final_color, 1.0);
+                }
+            `;
+            function compileShader(gl, type, source) {
+                const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return null; return shader;
+            }
+            const program = gl.createProgram();
+            gl.attachShader(program, compileShader(gl, gl.VERTEX_SHADER, vsSource));
+            gl.attachShader(program, compileShader(gl, gl.FRAGMENT_SHADER, fsSource));
+            gl.linkProgram(program); gl.useProgram(program);
+            const positions = new Float32Array([-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0]);
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+            const positionLocation = gl.getAttribLocation(program, "aVertexPosition");
+            gl.enableVertexAttribArray(positionLocation); gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            const resolutionLocation = gl.getUniformLocation(program, "u_resolution"); const timeLocation = gl.getUniformLocation(program, "u_time");
+            let startTime = Date.now();
+            function render() {
+                gl.uniform2f(resolutionLocation, canvas.width, canvas.height); gl.uniform1f(timeLocation, (Date.now() - startTime) / 1000.0);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(render);
+            }
+            render();
+        }
+    </script>
+</body>
+</html>
